@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  turtlebot_humble:
+    image: turtlebot_humble:latest
+    container_name: turtlebot_humble_container
+    hostname: turtlebot_humble_container
+    runtime: nvidia
+    environment:
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+      - DISPLAY
+    devices:
+      - /dev/dri
+      - /dev/input/js0:/dev/input/js0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./:/turtlebot_ws/src:rw  # Mount the current directory as readable and writable
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    restart: no
+    network_mode: "host"  # Add this line to use the host network
+    command: /bin/bash
+    #command: bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch robot_gazebo main_robot.launch.py"
+
