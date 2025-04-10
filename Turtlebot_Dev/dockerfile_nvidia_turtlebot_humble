@@ -48,7 +48,8 @@ RUN apt-get install -y ros-humble-ros2-control \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-plotjuggler-ros \
     ros-humble-slam-toolbox  \
-    ros-humble-joy-linux
+    ros-humble-joy-linux \
+    ros-humble-robot-localization
 
 RUN apt-get install -y net-tools \
     && apt-get install -y gedit
@@ -60,12 +61,13 @@ RUN mkdir -p /turtlebot_ws/src \
 COPY ./ /turtlebot_ws/src 
 
 
-
 WORKDIR /turtlebot_ws
 
 RUN source /opt/ros/humble/setup.bash  \
     && colcon build \
     && source install/setup.bash
+
+RUN chmod +x /turtlebot_ws/src/launch_remote_robots.sh
 
 RUN echo "export ROS_DOMAIN_ID=30" >> ~/.bashrc && \
     echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.bashrc && \

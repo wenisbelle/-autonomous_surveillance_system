@@ -18,7 +18,7 @@ For this prototype I will be using very simple robots as the turtlebot and the c
 - NVIDIA Container Toolkit 
  
 
-## Installation
+# Installation
 First of all just clone this project into your repository.
 
     git clone https://github.com/wenisbelle/Tecdron.git
@@ -37,8 +37,8 @@ To create the container just run:
 
 Note that this file requires a joystick connected in the port /dev/js0. If you have a different port or just don't wanna use the joystick you can simple remove that line from this file. 
 
-## Usage
-For now you still need to run the ros2 packages on the turtlebots using ssh, but I will study some way of bypass this on the future. And I still didn't put the drone inside the system. These are the robot configurations:
+# Usage
+For now you still need to run the ros2 packages on the turtlebots using ssh, using ssh manually or with and automated script. It's important to notice that I still didn't put the drone inside the system. These are the robot configurations:
 
 ### Devices Access Info
 
@@ -49,7 +49,7 @@ For now you still need to run the ros2 packages on the turtlebots using ssh, but
 
 Now just ssh in the robots. And be sure that the host computer address is 192.168.1.10, this is important for the DDS communication that will be discussed.
 
-### Running each robot
+### Running each robot manually
 
 Inside each robot just run the following command:
 
@@ -57,7 +57,22 @@ Inside each robot just run the following command:
 
 Now the local system of the robot must be running and you will be able to see the topics on the host. 
 
-### Running the host
+### Running with an automated script
+
+Fist of all you need to create a SSH key:
+
+    ssh-keygen -t rsa -b 4096 -C "robot-launch"
+
+Secondly, copy this key to each robot:
+
+    ssh-copy-id pi@192.168.1.11
+    ssh-copy-id waffle@192.168.1.12
+
+Now just run the launch_remote_robots.sh scripts inside the source directory.
+
+    ./src/launch_remote_robots.sh
+
+## Running the host
 
 In the host container you can control both robots, sending the same command, using:
 
@@ -90,7 +105,15 @@ For that to work properly, some parameters must be set in all robots (turtlebots
 - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 - export CYCLONEDDS_URI = /robot_directory/src/dds_config/cyclonedds_unicast_wlan.xml
 
-### The new launch files
+### Slam
+
+To run the slam on the two turtlebots we use the SLAM toolbox, you need to start both robots together and then:
+
+    ros2 launch slam_toolbox online_async_turtlebots.launch.py
+
+I want to get deeper in this subject in the near future, exploring more how can I properly modify and use this package.
+
+Moreover, for now the slam is running on the host only, but I think that perhaps we can change that to run locally, just managing from the host.
 
 
 ## TODO
@@ -98,13 +121,15 @@ For that to work properly, some parameters must be set in all robots (turtlebots
 
 [ x ] Create a folder in the main git for the files in the waffle and in the burger
 
-[   ] Create a main launcher package to run everything smoothly
+[ x ] Create a main launcher package to run everything smoothly
 
-[   ] Find a way of launching everything from the host computer, without the ssh directly.
+[ x ] Find a way of launching everything from the host computer, without the ssh directly.
 
 [   ] Changging the docker internet configurations, making that the container has the address 192.168.1.10, independently from the host network configurations.
 
-[   ] Improve the documentation of the SLAM
+[  x ] Improve the documentation of the SLAM
+
+[    ] Testing more heavily the SLAM with multiple robots 
 
 [   ] Use nav2
 
